@@ -9,6 +9,6 @@ name = "Data"
 name = "Printf"
 
 [[lean_exe]]
-name = "printf"
-root = "Main"
+name = "printf_tests"
+root = "Tests.Main"
 
