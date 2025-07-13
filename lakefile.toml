@@ -1,0 +1,14 @@
+name = "printf"
+version = "0.0.1"
+defaultTargets = ["Data", "Printf"]
+
+[[lean_lib]]
+name = "Data"
+
+[[lean_lib]]
+name = "Printf"
+
+[[lean_exe]]
+name = "printf"
+root = "Main"
+
