@@ -18,7 +18,7 @@ jobs:
         export LEAN_ABORT_ON_PANIC=1
         # to ensure that the `--query` test below has a baseline to compare against.
         rm -rf .lake/build/docs
-        lake build Free:docs
+        lake build Printf:docs
 
     - name: Upload static files as artifact
       id: deployment
