@@ -1,6 +1,7 @@
 name = "printf"
 version = "0.0.1"
 defaultTargets = ["Printf"]
+testDriver = "printf_tests"
 
 [[lean_lib]]
 name = "Data"

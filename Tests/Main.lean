@@ -2,6 +2,11 @@ import Printf
 
 open Printf
 
+#eval printf "%s: %d + %d = %d\n" "Sum" 2 7 9
+-- Output: "Sum: 2 + 7 = 9\n"
+#eval printf "Pi ≈ %.3f" 3.1415926
+-- Output: "Pi ≈ 3.142"
+
 def main : IO Unit := do
   printf "Hello World!\n"
   printf "Hello %s!\n" "World"

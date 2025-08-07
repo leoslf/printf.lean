@@ -13,6 +13,7 @@ instance : PrintfType (IO Unit) where
   spr fmt args :=
     IO.print $ uprintf fmt $ args.reverse
 
+@[default_instance]
 instance : PrintfType String where
   spr fmt args := uprintf fmt $ args.reverse
 
