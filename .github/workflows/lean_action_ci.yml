@@ -10,5 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
+    - uses: actions/checkout@v4
+    - uses: leanprover/lean-action@v1
+    - name: Build docs
+      working-directory: docbuild
+      run: |
+        export LEAN_ABORT_ON_PANIC=1
+        # to ensure that the `--query` test below has a baseline to compare against.
+        rm -rf .lake/build/docs
+        lake build Printf:docs

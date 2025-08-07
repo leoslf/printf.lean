@@ -1,4 +1,4 @@
-name = "printf"
+name = "Printf"
 version = "0.0.1"
 defaultTargets = ["Printf"]
 testDriver = "printf_tests"
