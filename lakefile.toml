@@ -1,6 +1,6 @@
 name = "printf"
 version = "0.0.1"
-defaultTargets = ["Data", "Printf"]
+defaultTargets = ["Printf"]
 
 [[lean_lib]]
 name = "Data"
