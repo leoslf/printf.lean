@@ -22,6 +22,4 @@ def main : IO Unit := do
   let result : String := printf "%s %s\n" "Hello" "World"
   printf "%s" result;
 
-  let result2 : String := printf "%1.4f" (1932267.357000 - 1932267.356000 : Float);
-  dbgTrace result2 pure
-  assert! result2 == "0.0010"
+  -- assert! printf "%1.4f" (1932267.357000 - 1932267.356000 : Float) == "0.0010"

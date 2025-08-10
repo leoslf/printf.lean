@@ -427,28 +427,27 @@ partial def RealFloat.formatAlt {f : Type u} [RealFloat f] (alt : Bool) (fmt : F
       let mk0 : String -> String
       | "" => "0"
       | ls => ls
-      let replicate (n : Nat) (c : Char) := List.replicate n c |>.asString
       match decs with
       | .none =>
         if e <= 0 then
-          "0." ++ replicate (-e |>.toNat) '0' ++ ds.asString
+          "0." ++ (List.replicate (-e |>.toNat) '0' ++ ds).asString
         else
-          let rec go := fun
-            | 0, s, rs => mk0 (s.toList.reverse.asString) ++ "." ++ mk0 rs.asString
-            | n, s, [] => go (n - 1) ("0" ++ s) []
-            | n, s, r :: rs => go (n - 1) (String.singleton r ++ s) rs
-          go e "" ds
+          let rec f : Nat -> String -> ShowS
+          | 0, s, rs => mk0 s.reverse ++ "." ++ mk0 rs
+          | n, s, ⟨[]⟩ => f (n - 1) ("0" ++ s) ""
+          | n, s, ⟨r :: rs⟩ => f (n - 1) ⟨r :: s.data⟩ ⟨rs⟩
+          f e.toNat "" ⟨ds⟩
       | .some dec =>
         let dec' := Max.max dec 0
         if e >= 0 then
           let (ei, is') := roundTo base (dec' + e) is
-          let (ls, rs) := (is'.map (Nat.toDigit ∘ Int.toNat)).splitAt (e + ei).toNat
-          mk0 ls.asString ++ (if rs.isEmpty ∧ not alt then "" else "." ++ rs.asString)
+          let (ls, rs) := is'.map Int.toDigit |>.splitAt (e + ei).toNat
+          mk0 (ls ++ (if rs.isEmpty && not alt then [] else ('.' :: rs))).asString
         else
-          let (ei, is') := roundTo base dec' (List.replicate (-e).toNat 0 ++ is)
-          match (if ei > 0 then is'.dropLast else is').map (Nat.toDigit ∘ Int.toNat) with
-          | d :: ds' => String.singleton d ++ (if ds'.isEmpty ∧ not alt then "" else "." ++ ds'.asString)
-          | [] => panic "should not happen"
+          let (ei, is') := roundTo base dec' $ List.replicate (-e).toNat 0 ++ is
+          match (if ei > 0 then is' else (0 :: is')).map Int.toDigit with
+          | d :: ds' => (d :: (if ds'.isEmpty && not alt then [] else ('.' :: ds'))).asString
+          | _ => unreachable!
 
   if RealFloat.isNaN x then
     "NaN"
