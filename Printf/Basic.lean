@@ -4,10 +4,6 @@ import Printf.Classes.HPrintfType
 
 namespace Printf
 
-open Printf.Classes.PrintfArg
-open Printf.Classes.PrintfType
-open Printf.Classes.HPrintfType
-
 open Lean Macro
 
 -- -- NOTE: seems varargs via typeclass polymorphism lean4 does not work

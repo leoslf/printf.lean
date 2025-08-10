@@ -1,8 +1,6 @@
 import Printf.Classes.PrintfArg
 
-namespace Printf.Classes.HPrintfType
-
-open Printf.Classes.PrintfArg
+namespace Printf
 
 class HPrintfType t where
   hspr : IO.FS.Handle -> String -> List UPrintf -> t

@@ -1,10 +1,9 @@
-import Data.Num
-import Data.Char
+import Printf.Extensions
 
-namespace Data.Integral
+import Printf.Classes.Num
+import Printf.Classes.IsChar
 
-open Data.Num
-open Data.Char
+namespace Printf
 
 universe u
 
@@ -87,9 +86,9 @@ def divMod {n : Type u} [Div n] [Mod n] (a : n) (b : n) : n × n :=
   (a / b, a % b)
 
 partial def itosb (b : Nat) (n : Int) : String :=
-  if n >= 0 ∧ n.toNat < b then
-    String.singleton $ natToDigit n.toNat
+  if n >= 0 || n.toNat < b then
+    String.singleton $ Nat.toDigit n.toNat
   else
     let (q, r) := divMod n $ Int.ofNat b
-    itosb b q ++ (natToDigit $ r.toNat).toString
+    itosb b q ++ (Nat.toDigit $ r.toNat).toString
 

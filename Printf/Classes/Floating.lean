@@ -1,26 +1,12 @@
-import Data.Num
-import Data.Ord
-import Data.Char
-import Data.Integral
+import Printf.Extensions
 
-namespace Data.Floating
+import Printf.Classes.Num
+import Printf.Classes.IsChar
+import Printf.Classes.Integral
 
-open Data.Num
-open Data.Ord
-open Data.Char
-open Data.Integral
+namespace Printf
 
 universe u
-
-def Float32.radix  := 2 -- FLT_RADIX
-def Float32.digits := 24 -- FLT_MANT_DIG
-def Float32.minExp := -125 -- FLT_MIN_EXP
-def Float32.maxExp := 128 -- FLT_MAX_EXP
-
-def Float.radix := 2 -- FLT_RADIX
-def Float.digits := 53 -- DBL_MANT_DIG
-def Float.minExp := -1021 -- DBL_MIN_EXP
-def Float.maxExp := 1024 -- DBL_MAX_EXP
 
 class Real (a : Type u) extends OfInt a, Num a, Neg a, Ord a, LT a, BEq a where
   -- toRational : a -> Rat
@@ -49,6 +35,19 @@ inductive FFFormat where
 | Fixed : FFFormat
 | Generic : FFFormat
 
+class RealFrac (a : Type u) extends Real a, Fractional a where
+  properFraction : {b : Type u} -> [Integral b] -> a -> b × a
+  /-- truncate x returns the integer nearest x between zero and x -/
+  truncate : {b : Type v} -> [Integral b] -> a -> b
+  round : {b : Type v} -> [Integral b] -> a -> b
+  ceil : {b : Type v} -> [Integral b] -> a -> b
+  floor : {b : Type v} -> [Integral b] -> a -> b
+
+def Float32.radix  := 2 -- FLT_RADIX
+def Float32.digits := 24 -- FLT_MANT_DIG
+def Float32.minExp := -125 -- FLT_MIN_EXP
+def Float32.maxExp := 128 -- FLT_MAX_EXP
+
 partial def Float32.decode (x : Float32) : Int × Int :=
   if x == 0.0 then
     (0, 0)
@@ -66,6 +65,32 @@ partial def Float32.decode (x : Float32) : Int × Int :=
 def Float32.encode (significand : Int) (exponent : Int) : Float32 :=
   Float32.scaleB (Float32.ofInt significand) exponent
 
+def Float32.properFraction {b : Type u} [Integral b] (x : Float32) : b × Float32 :=
+  match Float32.decode x with
+  | (m, n) =>
+    if n >= 0 then
+      (OfInt.ofInt $ m * Float32.radix ^ n.toNat, 0.0)
+    else
+      match divMod m (Float32.radix ^ (-n).toNat) with
+      | (w, r) => (OfInt.ofInt w, Float32.encode r n)
+
+def Float32.truncate {b : Type u} [Integral b] (x : Float32) : b :=
+  let (m, _) := Float32.properFraction x
+  m
+
+
+instance : RealFrac Float32 where
+  properFraction := Float32.properFraction
+  truncate := Float32.truncate
+  round := Float32.truncate ∘ Float32.round
+  ceil := Float32.truncate ∘ Float32.ceil
+  floor := Float32.truncate ∘ Float32.floor
+
+def Float.radix := 2 -- FLT_RADIX
+def Float.digits := 53 -- DBL_MANT_DIG
+def Float.minExp := -1021 -- DBL_MIN_EXP
+def Float.maxExp := 1024 -- DBL_MAX_EXP
+
 partial def Float.decode (x : Float) : Int × Int :=
   if x == 0.0 then
     (0, 0)
@@ -82,34 +107,6 @@ partial def Float.decode (x : Float) : Int × Int :=
 
 def Float.encode (significand : Int) (exponent : Int) : Float :=
   Float.scaleB (Float.ofInt significand) exponent
-
-class RealFrac (a : Type u) extends Real a, Fractional a where
-  properFraction : {b : Type u} -> [Integral b] -> a -> b × a
-  /-- truncate x returns the integer nearest x between zero and x -/
-  truncate : {b : Type v} -> [Integral b] -> a -> b
-  round : {b : Type v} -> [Integral b] -> a -> b
-  ceil : {b : Type v} -> [Integral b] -> a -> b
-  floor : {b : Type v} -> [Integral b] -> a -> b
-
-def Float32.properFraction {b : Type u} [Integral b] (x : Float32) : b × Float32 :=
-  match Float32.decode x with
-  | (m, n) =>
-    if n >= 0 then
-      (OfInt.ofInt $ m * Float32.radix ^ n.toNat, 0.0)
-    else
-      match divMod m (Float32.radix ^ (-n).toNat) with
-      | (w, r) => (OfInt.ofInt w, Float32.encode r n)
-
-def Float32.truncate {b : Type u} [Integral b] (x : Float32) : b :=
-  let (m, _) := Float32.properFraction x
-  m
-
-instance : RealFrac Float32 where
-  properFraction := Float32.properFraction
-  truncate := Float32.truncate
-  round := Float32.truncate ∘ Float32.round
-  ceil := Float32.truncate ∘ Float32.ceil
-  floor := Float32.truncate ∘ Float32.floor
 
 def Float.properFraction {b : Type u} [Integral b] (x : Float) : b × Float :=
   match Float.decode x with
@@ -397,7 +394,7 @@ def showString : String -> ShowS :=
 partial def RealFloat.formatAlt {f : Type u} [RealFloat f] (alt : Bool) (fmt : FFFormat) (decs : Option Int) (x : f) : String :=
   let base := 10
   let rec doFmt : FFFormat -> List Int × Int -> String := fun fmt (is, e) =>
-    let ds : List Char := is.map (natToDigit ∘ Int.toNat)
+    let ds : List Char := is.map (Nat.toDigit ∘ Int.toNat)
     match fmt with
     | .Generic => doFmt (if e < 0 ∨ e > 7 then .Exponent else .Fixed) (is, e)
     | .Exponent =>
@@ -415,7 +412,7 @@ partial def RealFloat.formatAlt {f : Type u} [RealFloat f] (alt : Bool) (fmt : F
           | [0] => "0e0"
           | _ =>
             let (ei, is') := roundTo base 1 is
-            let n := ((if ei > 0 then is'.dropLast else is').map (natToDigit ∘ Int.toNat))[0]!
+            let n := ((if ei > 0 then is'.dropLast else is').map (Nat.toDigit ∘ Int.toNat))[0]!
             String.singleton n ++ s!"e{e - 1 + ei}"
         else
           let dec' := Max.max dec 1
@@ -423,18 +420,18 @@ partial def RealFloat.formatAlt {f : Type u} [RealFloat f] (alt : Bool) (fmt : F
           | [0] => "0." ++ ("".pushn '0' $ dec'.toNat) ++ "e0"
           | _ =>
             let (ei, is') := roundTo base 1 is
-            match (if ei > 0 then is'.dropLast else is').map (natToDigit ∘ Int.toNat) with
+            match (if ei > 0 then is'.dropLast else is').map (Nat.toDigit ∘ Int.toNat) with
             | d :: ds' => (d :: '.' :: ds').asString ++ s!"e{e - 1 + ei}"
             | [] => panic "should not happen"
     | .Fixed =>
-      let mk0 := fun ls =>
-        match ls with
-        | "" => "0"
-        | _ => ls
+      let mk0 : String -> String
+      | "" => "0"
+      | ls => ls
+      let replicate (n : Nat) (c : Char) := List.replicate n c |>.asString
       match decs with
       | .none =>
         if e <= 0 then
-          "0." ++ ("".pushn '0' $ (-e).toNat) ++ ds.asString
+          "0." ++ replicate (-e |>.toNat) '0' ++ ds.asString
         else
           let rec go := fun
             | 0, s, rs => mk0 (s.toList.reverse.asString) ++ "." ++ mk0 rs.asString
@@ -445,11 +442,11 @@ partial def RealFloat.formatAlt {f : Type u} [RealFloat f] (alt : Bool) (fmt : F
         let dec' := Max.max dec 0
         if e >= 0 then
           let (ei, is') := roundTo base (dec' + e) is
-          let (ls, rs) := (is'.map (natToDigit ∘ Int.toNat)).splitAt (e + ei).toNat
+          let (ls, rs) := (is'.map (Nat.toDigit ∘ Int.toNat)).splitAt (e + ei).toNat
           mk0 ls.asString ++ (if rs.isEmpty ∧ not alt then "" else "." ++ rs.asString)
         else
           let (ei, is') := roundTo base dec' (List.replicate (-e).toNat 0 ++ is)
-          match (if ei > 0 then is'.dropLast else is').map (natToDigit ∘ Int.toNat) with
+          match (if ei > 0 then is'.dropLast else is').map (Nat.toDigit ∘ Int.toNat) with
           | d :: ds' => String.singleton d ++ (if ds'.isEmpty ∧ not alt then "" else "." ++ ds'.asString)
           | [] => panic "should not happen"
 

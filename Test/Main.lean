@@ -7,6 +7,8 @@ open Printf
 #eval printf "Pi ≈ %.3f" 3.1415926
 -- Output: "Pi ≈ 3.142"
 
+#eval printf "Finished in %1.4f seconds" (1932267.357000 - 1932267.356000 : Float)
+
 def main : IO Unit := do
   printf "Hello World!\n"
   printf "Hello %s!\n" "World"
@@ -18,4 +20,8 @@ def main : IO Unit := do
   let zero : Int8 := 0
   printf "%hhd\n" zero
   let result : String := printf "%s %s\n" "Hello" "World"
-  printf "%s" result
+  printf "%s" result;
+
+  let result2 : String := printf "%1.4f" (1932267.357000 - 1932267.356000 : Float);
+  dbgTrace result2 pure
+  assert! result2 == "0.0010"

@@ -4,12 +4,9 @@ defaultTargets = ["Printf"]
 testDriver = "printf_tests"
 
 [[lean_lib]]
-name = "Data"
-
-[[lean_lib]]
 name = "Printf"
 
 [[lean_exe]]
 name = "printf_tests"
-root = "Tests.Main"
+root = "Test.Main"
 

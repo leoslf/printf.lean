@@ -1,4 +1,4 @@
-namespace Data.Bounded
+namespace Printf
 
 class Bounded a where
   minBound : a

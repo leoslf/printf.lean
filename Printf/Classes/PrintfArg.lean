@@ -1,16 +1,11 @@
-import Data.Char
-import Data.Integral
-import Data.Bounded
-import Data.Floating
-import Data.Foldable
+import Printf.Extensions
 
-namespace Printf.Classes.PrintfArg
+import Printf.Classes.IsChar
+import Printf.Classes.Integral
+import Printf.Classes.Bounded
+import Printf.Classes.Floating
 
-open Data.Char
-open Data.Integral
-open Data.Bounded
-open Data.Floating
-open Data.Foldable
+namespace Printf
 
 universe u
 
@@ -34,8 +29,6 @@ def dfmt {f : Type u} [RealFloat f] (c : Char) (p : Option Int) (a : Bool) (d : 
   | '-' :: cs => ("-", cs.asString)
   | cs => ("", cs.asString)
 
-
-abbrev ShowS := String -> String
 
 inductive FormatAdjustment where
 | LeftAdjust : FormatAdjustment
@@ -183,7 +176,7 @@ partial def fmtu : Int -> Option String -> Option Int -> Option Int -> Int -> St
   let rec fmtu' : Option Int -> Option Int -> Bool -> Int -> Option String
   | prec, .some m, true, i => fmtu' prec .none false $ -2 * m + i
   | .some prec, _, false, i => integral_prec (.some prec) <$> fmtu' .none .none false i
-  | .none, _, false, i => .some $ showIntAtBase b (natToDigit ∘ Int.toNat) i ""
+  | .none, _, false, i => .some $ showIntAtBase b (Nat.toDigit ∘ Int.toNat) i ""
   | _, _, _, _ => .none
   match fmtu' prec0 m0 (i0 < 0) i0 with
   | .some s => ("", s)
@@ -251,9 +244,6 @@ def formatInt [Integral a] : a -> FieldFormat -> ShowS
 
 def formatChar : Char -> FieldFormat -> ShowS
 | x, ufmt => formatIntegral (.some 0) (Integral.toInt $ x.toNat) $ vFmt 'c' ufmt
-
-def showString : String -> ShowS :=
-  String.append
 
 def formatRealFloat {f : Type u} [RealFloat f] : f -> FieldFormatter
 | x, ufmt =>

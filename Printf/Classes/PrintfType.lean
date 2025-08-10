@@ -1,10 +1,7 @@
-import Data.Char
+import Printf.Classes.IsChar
 import Printf.Classes.PrintfArg
 
-namespace Printf.Classes.PrintfType
-
-open Data.Char
-open Printf.Classes.PrintfArg
+namespace Printf
 
 class PrintfType t where
   spr : String -> List UPrintf -> t
