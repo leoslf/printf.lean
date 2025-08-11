@@ -9,7 +9,7 @@ namespace Printf
 
 universe u
 
-def perror [Inhabited a] (message : String) : a :=
+private def perror [Inhabited a] (message : String) : a :=
   panic s!"Printf.printf: {message}"
 
 def errorBadFormat (c : Char) : String := s!"bad formatting char {c}"
@@ -17,15 +17,15 @@ def errorShortFormat : String := "formatting string ended prematurely"
 def errorMissingArgument : String := "argument list ended prematurely"
 def errorBadArgument : String := "bad argument"
 
-def dfmt {f : Type u} [RealFloat f] (c : Char) (p : Option Int) (a : Bool) (d : f) : String × String :=
+def dfmt {f : Type u} [RealFloat f] (c : Char) (p? : Option Int) (alt : Bool) (x : f) : String × String :=
   let caseConvert := if c.isUpper then String.toUpper else id
-  let showFunction : Option Int -> f -> String -> String :=
+  let showFunction : Option Int -> f -> ShowS :=
     match c.toLower with
     | 'e' => showEFloat
-    | 'f' => if a then showFFloatAlt else showFFloat
-    | 'g' => if a then showGFloatAlt else showGFloat
+    | 'f' => showFFloat (alt := alt)
+    | 'g' => showGFloat (alt := alt)
     | _ => perror "internal error: impossible dfmt"
-  match (caseConvert $ showFunction p d "").toList with
+  match (caseConvert $ showFunction p? x "").toList with
   | '-' :: cs => ("-", cs.asString)
   | cs => ("", cs.asString)
 

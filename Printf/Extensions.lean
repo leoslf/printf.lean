@@ -17,3 +17,14 @@ def String.reverse (self : String) : String :=
 
 def String.replicate (n : Nat) (c : Char) : String :=
   List.replicate n c |>.asString
+
+def String.splitAt (n : Nat) (self : String) : String × String :=
+  (self.take n, self.drop n)
+
+@[never_extract]
+def dbgTraceM [Monad m] (s : String) : m Unit :=
+  dbgTrace s pure
+
+@[never_extract]
+def dbgTraceValWith [ToString s] (f : a -> s) (value : a) : a :=
+  dbgTrace (toString $ f value) λ() => value

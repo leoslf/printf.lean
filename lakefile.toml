@@ -5,8 +5,15 @@ testDriver = "printf_tests"
 
 [[lean_lib]]
 name = "Printf"
+# precompileModules = true
+buildType = "debug"
+platformIndependent = true
+
+[[lean_lib]]
+name = "Test"
 
 [[lean_exe]]
 name = "printf_tests"
 root = "Test.Main"
-
+buildType = "debug"
+needs = ["Printf"]
