@@ -415,7 +415,6 @@ abbrev ShowS := String -> String
 def showString : String -> ShowS :=
   String.append
 
-open String (replicate) in
 partial def RealFloat.format {f : Type u} [RealFloat f] (fmt : FFFormat) (dec? : Option Int) (self : f) (alt : Bool := false) : String :=
   let rec doFmt (fmt : FFFormat) : List Int × Int -> String
   | (is, e) => Id.run do
@@ -483,6 +482,9 @@ partial def RealFloat.format {f : Type u} [RealFloat f] (fmt : FFFormat) (dec? :
     doFmt fmt (toDigits base self)
  where
   base : Nat := 10
+
+  replicate (n : Nat) (c : Char) : String :=
+    List.replicate n c |>.asString
 
   mk0 : String -> String
   | "" => "0"

@@ -15,9 +15,6 @@ def String.with (f : List Char -> List Char) : String -> String :=
 def String.reverse (self : String) : String :=
   self.with $ List.reverse
 
-def String.replicate (n : Nat) (c : Char) : String :=
-  List.replicate n c |>.asString
-
 def String.splitAt (n : Nat) (self : String) : String × String :=
   (self.take n, self.drop n)
 
