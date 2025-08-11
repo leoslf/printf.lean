@@ -256,7 +256,7 @@ def formatRealFloat {f : Type u} [RealFloat f] : f -> FieldFormatter
   | _ =>
     perror $ errorBadFormat c
 
-class PrintfArg a where
+class PrintfArg (a : Type u) where
   formatArg : a -> FieldFormatter
   parseFormat : a -> ModifierParser := fun
   | _, format =>

@@ -1,6 +1,8 @@
 namespace Printf
 
-class Bounded a where
+universe u
+
+class Bounded (a : Type u) where
   minBound : a
   maxBound : a
 

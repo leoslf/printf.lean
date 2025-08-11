@@ -2,10 +2,12 @@ import Printf.Extensions
 
 namespace Printf
 
-class Sign a where
+universe u
+
+class Sign (a : Type u) where
   sign : a -> a
 
-class Num a extends Add a, Sub a, Mul a, Div a, Ord a, LT a, LE a, BEq a where
+class Num (a : Type u) extends Add a, Sub a, Mul a, Div a, Ord a, LT a, LE a, BEq a where
 
 instance : Num Nat where
 

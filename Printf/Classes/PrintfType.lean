@@ -3,7 +3,9 @@ import Printf.Classes.PrintfArg
 
 namespace Printf
 
-class PrintfType t where
+universe u
+
+class PrintfType (t : Type u) where
   spr : String -> List UPrintf -> t
 
 instance : PrintfType (IO Unit) where

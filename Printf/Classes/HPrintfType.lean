@@ -2,7 +2,7 @@ import Printf.Classes.PrintfArg
 
 namespace Printf
 
-class HPrintfType t where
+class HPrintfType (t : Type u) where
   hspr : IO.FS.Handle -> String -> List UPrintf -> t
 
 instance : HPrintfType (IO Unit) where
