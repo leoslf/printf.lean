@@ -9,11 +9,3 @@ def Nat.toDigit (n : Nat) : Char :=
 def Int.toDigit (n : Int) : Char :=
   n.toNat.toDigit
 
-def String.with (f : List Char -> List Char) : String -> String :=
-  List.asString ∘ f ∘ String.toList
-
-def String.reverse (self : String) : String :=
-  self.with $ List.reverse
-
-def String.splitAt (n : Nat) (self : String) : String × String :=
-  (self.take n, self.drop n)

@@ -453,7 +453,7 @@ partial def RealFloat.format {f : Type u} [RealFloat f] (fmt : FFFormat) (dec? :
           return s!"0.{replicate (-e).toNat '0'}{ds}"
         else
           let rec f : Nat -> String -> ShowS
-            | 0, s, rs => mk0 s.reverse ++ "." ++ mk0 rs
+            | 0, s, rs => mk0 (reverse s) ++ "." ++ mk0 rs
             | n, s, ⟨[]⟩ => f (n - 1) ("0" ++ s) ""
             | n, s, ⟨r :: rs⟩ => f (n - 1) ⟨r :: s.data⟩ ⟨rs⟩
           return f e.toNat "" ds
@@ -461,7 +461,7 @@ partial def RealFloat.format {f : Type u} [RealFloat f] (fmt : FFFormat) (dec? :
         let dec' := Max.max dec 0
         if e >= 0 then
           let (ei, is') := roundTo base (dec' + e) is
-          let (ls, rs) := is'.map Int.toDigit |>.asString.splitAt (e + ei).toNat
+          let (ls, rs) := splitAt (e + ei).toNat $ is'.map Int.toDigit |>.asString
           return mk0 ls ++ (if rs.isEmpty && not alt then "" else "." ++ rs)
         else
           let (ei, is') := roundTo base dec' (List.replicate (-e).toNat 0 ++ is)
@@ -485,6 +485,12 @@ partial def RealFloat.format {f : Type u} [RealFloat f] (fmt : FFFormat) (dec? :
 
   replicate (n : Nat) (c : Char) : String :=
     List.replicate n c |>.asString
+
+  reverse (s : String) : String :=
+    s.toList.reverse.asString
+
+  splitAt (n : Nat) (s : String) : String × String :=
+    (s.take n, s.drop n)
 
   mk0 : String -> String
   | "" => "0"
