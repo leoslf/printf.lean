@@ -24,3 +24,6 @@ open Printf
 -- Returns: "Pi ≈ 3.142"
 ```
 
+# References
+
+Haskell.org, 2025. https://hackage.haskell.org/package/base-4.21.0.0/docs/src/Text.Printf.html (accessed Aug. 15, 2025).
